@@ -6,7 +6,7 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
-COPY .env .env
+# COPY .env .env
 # # Install debugging tools
 # RUN apk add --no-cache netcat-openbsd iputils bind-tools
 
