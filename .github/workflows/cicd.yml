@@ -1,0 +1,30 @@
+name: CSM backend
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+      - name: Login to docker hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}     
+      - name: Build Docker Image
+        run: docker build -t csmaviation/csmbackend  .
+      - name: Publish Image to docker hub
+        run: docker push csmaviation/csmbackend:latest 
+ 
+  deploy:
+    needs: build
+    runs-on: self-hosted 
+    steps:
+      - name: Pull image from docker hub
+        run: docker pull csmaviation/csmbackend:latest 
+      - name: Delete old container
+        run: docker rm -f nodejs-app-container  
+      - name: Run Docker Container
+        run: docker run -d -p 5000:5000 --name nodejs-app-container -e MONGO_PASSWORD='${{ secrets.MONGO_PASSWORD }}' csmaviation/csmbackend
