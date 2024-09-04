@@ -27,7 +27,16 @@ jobs:
     steps:
       - name: Pull image from docker hub
         run: docker pull csmaviation/csmbackend:latest 
-      - name: Delete old container
-        run: docker rm -f nodejs-app-container  
+      - name: Stop and remove existing container
+        run: |
+          docker stop nodejs-app-container || true
+          docker rm nodejs-app-container || true
+        continue-on-error: true
       - name: Run Docker Container
-        run: docker run -d -p 5000:5000 --name nodejs-app-container -e MONGO_PASSWORD='${{ secrets.MONGO_USER_PASSWORD }}' csmaviation/csmbackend
+        run: |
+          docker run -d --init --name nodejs-app-container \
+            -p 5000:5000 \
+            -e MONGO_PASSWORD='${{ secrets.MONGO_USER_PASSWORD }}' \
+            csmaviation/csmbackend
+      - name: Prune unused Docker resources
+        run: docker system prune -f
