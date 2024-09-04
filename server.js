@@ -5,7 +5,13 @@ const { connectToDatabase, client } = require('./mongoCon.js');
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors());
+// Configure CORS
+const corsOptions = {
+  origin: 'https://www.thisisatestspacefor.design', // Replace with your Vercel frontend URL
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 let db;
