@@ -5,21 +5,11 @@ const { connectToDatabase, client } = require('./mongoCon.js');
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Configure CORS
-const corsOptions = {
-  origin: ['https://www.thisisatestspacefor.design', 'http://localhost:3000'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 
-app.options('*', cors(corsOptions));
-
 let db;
+
 
 // Connect to the database before starting the server
 connectToDatabase().then((database) => {
