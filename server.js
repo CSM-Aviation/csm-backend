@@ -61,6 +61,18 @@ connectToDatabase().then((database) => {
     }
   });
 
+  app.post('/api/trip-request', async (req, res) => {
+    try {
+      const tripRequest = new TripRequest(req.body);
+      const result = await tripRequest.save();
+      res.status(201).json({ message: 'Trip request submitted successfully', id: result._id });
+    } catch (error) {
+      console.error('Error saving trip request:', error);
+      res.status(500).json({ error: 'Server error' });
+    }
+  });
+
+
   app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
   });
