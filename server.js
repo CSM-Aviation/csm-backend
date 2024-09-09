@@ -74,6 +74,24 @@ connectToDatabase().then((database) => {
     }
   });
 
+  
+  // Endpoint to fetch all fleet
+  app.get('/api/fleet', async (req, res) => {
+    try {
+      const fleetCursor = db.collection('fleet').find();
+      const fleetArray = await fleetCursor.toArray();
+
+      if (fleetArray.length === 0) {
+        return res.status(404).json({ error: 'No fleet data found' });
+      }
+
+      res.json(fleetArray);
+    } catch (error) {
+      console.error('Error fetching fleet data:', error);
+      res.status(500).json({ error: 'Server error' });
+    }
+  });
+
 
   app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
