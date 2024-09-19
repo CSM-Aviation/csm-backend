@@ -252,9 +252,13 @@ connectToDatabase().then((database) => {
     try {
       const pageviews = db.collection('pageviews');
 
-      const totalVisitors = await pageviews.distinct('sessionId').length;
+      const distinctVisitors = await pageviews.distinct('sessionId');
+      const totalVisitors = distinctVisitors.length;
       const totalPageViews = await pageviews.countDocuments();
-      const newUsers = await pageviews.distinct('sessionId', { pageViews: 1 }).length;
+
+      const newUsersQuery = { pageViews: 1 };
+      const distinctNewUsers = await pageviews.distinct('sessionId', newUsersQuery);
+      const newUsers = distinctNewUsers.length;
 
       const last7Days = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       const pageViewsLast7Days = await pageviews.aggregate([
@@ -264,7 +268,7 @@ connectToDatabase().then((database) => {
       ]).toArray();
 
       const userLocations = await pageviews.aggregate([
-        { $group: { _id: { city: "$city", region: "$region" }, count: { $sum: 1 } } },
+        { $group: { _id: { city: "$city", region: "$region", country: "$country" }, count: { $sum: 1 } } },
         { $sort: { count: -1 } },
         { $limit: 5 }
       ]).toArray();
@@ -288,7 +292,7 @@ connectToDatabase().then((database) => {
         newUsers,
         dates: pageViewsLast7Days.map(item => item._id),
         pageViews: pageViewsLast7Days.map(item => item.count),
-        userLocations: Object.fromEntries(userLocations.map(item => [`${item._id.city}, ${item._id.region}`, item.count])),
+        userLocations: Object.fromEntries(userLocations.map(item => [`${item._id.city}, ${item._id.region}, ${item._id.country}`, item.count])),
         pagesVisited: Object.fromEntries(pagesVisited.map(item => [item._id, item.count])),
         visitorTrend
       });
