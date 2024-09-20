@@ -73,3 +73,42 @@ exports.deleteS3Object = async (key) => {
     throw error;
   }
 };
+
+/**
+ * Lists objects in an S3 bucket with a specific prefix
+ * @param {string} prefix - The prefix to filter objects (e.g., "images/N30GT/")
+ * @param {number} maxKeys - The maximum number of keys to return (optional)
+ * @returns {Promise<AWS.S3.ListObjectsV2Output>} - A promise that resolves to the list of objects
+ */
+exports.listS3ObjectsWithPrefix = async (prefix, maxKeys = 1000) => {
+  const params = {
+    Bucket: process.env.S3_BUCKET_NAME,
+    Prefix: prefix,
+    MaxKeys: maxKeys
+  };
+
+  try {
+    return await s3.listObjectsV2(params).promise();
+  } catch (error) {
+    console.error('Error listing S3 objects:', error);
+    throw error;
+  }
+};
+
+/**
+ * Generates pre-signed URLs for an array of S3 object keys
+ * @param {string[]} keys - Array of S3 object keys
+ * @param {number} expirationInSeconds - URL expiration time in seconds (default: 3600 seconds / 1 hour)
+ * @returns {Promise<string[]>} - A promise that resolves to an array of pre-signed URLs
+ */
+exports.generateMultipleS3Urls = async (keys, expirationInSeconds = 3600) => {
+  try {
+    const urls = await Promise.all(keys.map(key =>
+      this.generateS3Url(key, expirationInSeconds)
+    ));
+    return urls;
+  } catch (error) {
+    console.error('Error generating multiple S3 URLs:', error);
+    throw error;
+  }
+};
