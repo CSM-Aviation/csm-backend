@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const fileUpload = require('express-fileupload');
 const errorHandler = require('./middleware/errorHandler');
 const helmet = require('helmet');
+const apiKeyMiddleware = require('./middleware/apiKeyMiddleware');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -33,8 +34,10 @@ app.use(cors({
     return callback(null, true);
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
+  credentials: true,
 }));
+app.use(apiKeyMiddleware);
 app.use(express.json());
 app.use(fileUpload({
   limits: { fileSize: 100 * 1024 * 1024 },
