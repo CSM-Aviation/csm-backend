@@ -25,9 +25,21 @@ async function getAircraftImages(registration) {
         const listResult = await listS3ObjectsWithPrefix(prefix);
 
         if (listResult.Contents && listResult.Contents.length > 0) {
-            const imageKeys = listResult.Contents.map(obj => obj.Key);
+            const imageKeys = listResult.Contents
+                .map(obj => obj.Key)
+                .filter(key => {
+                    // Filter out keys that end with '/' (directories) or don't have a file name
+                    const parts = key.split('/');
+                    return parts.length > 2 && parts[parts.length - 1] !== '';
+                });
+
             const imageUrls = await generateMultipleS3Urls(imageKeys);
-            return imageUrls;
+            return imageUrls.filter(url => {
+                // Additional filter to ensure the URL contains a file name
+                const urlParts = url.split('/');
+                const fileNamePart = urlParts[urlParts.length - 1].split('?')[0];
+                return fileNamePart !== '';
+            });
         }
 
         return [];

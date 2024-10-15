@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 900">
+  <style>
+    .title { font: bold 24px sans-serif; }
+    .header { font: bold 18px sans-serif; fill: #333; }
+    .subheader { font: bold 16px sans-serif; fill: #555; }
+    .field { font: 14px sans-serif; }
+    .type { font: italic 12px sans-serif; fill: #666; }
+    .group { fill: #f0f0f0; stroke: #ccc; }
+    .required { fill: #ffe6e6; }
+    .enum { fill: #e6f3ff; }
+    .object { fill: #e6ffe6; }
+    .array { fill: #fff0e6; }
+  </style>
+
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" class="title">CSM Aviation MongoDB User Schema</text>
+
+  <!-- Main Document -->
+  <rect x="10" y="50" width="780" height="840" rx="10" class="group"/>
+  <text x="20" y="75" class="header">User Document</text>
+
+  <!-- Required Fields -->
+  <rect x="20" y="90" width="370" height="80" rx="5" class="required"/>
+  <text x="30" y="110" class="subheader">Required Fields</text>
+  <text x="40" y="130" class="field">username: <tspan class="type">string</tspan></text>
+  <text x="40" y="150" class="field">password: <tspan class="type">string</tspan></text>
+
+  <!-- Basic Info -->
+  <rect x="400" y="90" width="380" height="180" rx="5" class="group"/>
+  <text x="410" y="110" class="subheader">Basic Information</text>
+  <text x="420" y="130" class="field">email: <tspan class="type">string (pattern: email)</tspan></text>
+  <text x="420" y="150" class="field">firstName: <tspan class="type">string</tspan></text>
+  <text x="420" y="170" class="field">lastName: <tspan class="type">string</tspan></text>
+  <text x="420" y="190" class="field">phoneNumber: <tspan class="type">string</tspan></text>
+  <text x="420" y="210" class="field">notes: <tspan class="type">string</tspan></text>
+  <text x="420" y="230" class="field">createdAt: <tspan class="type">date</tspan></text>
+  <text x="420" y="250" class="field">updatedAt: <tspan class="type">date</tspan></text>
+
+  <!-- User Type -->
+  <rect x="20" y="180" width="370" height="100" rx="5" class="enum"/>
+  <text x="30" y="200" class="subheader">User Type</text>
+  <text x="40" y="220" class="field">userType: <tspan class="type">enum</tspan></text>
+  <text x="50" y="240" class="field">• individual</text>
+  <text x="50" y="260" class="field">• business</text>
+  <text x="200" y="240" class="field">• medicalBroker</text>
+  <text x="200" y="260" class="field">• normalBroker</text>
+
+  <!-- Address -->
+  <rect x="20" y="290" width="370" height="140" rx="5" class="object"/>
+  <text x="30" y="310" class="subheader">Address</text>
+  <text x="40" y="330" class="field">street: <tspan class="type">string</tspan></text>
+  <text x="40" y="350" class="field">city: <tspan class="type">string</tspan></text>
+  <text x="40" y="370" class="field">state: <tspan class="type">string</tspan></text>
+  <text x="40" y="390" class="field">zipCode: <tspan class="type">string</tspan></text>
+  <text x="40" y="410" class="field">country: <tspan class="type">string</tspan></text>
+
+  <!-- Company Info -->
+  <rect x="400" y="290" width="380" height="140" rx="5" class="group"/>
+  <text x="410" y="310" class="subheader">Company Information</text>
+  <text x="420" y="330" class="field">companyName: <tspan class="type">string</tspan></text>
+  <text x="420" y="350" class="field">companySize: <tspan class="type">int</tspan></text>
+  <text x="420" y="370" class="field">industry: <tspan class="type">string</tspan></text>
+  <text x="420" y="390" class="field">brokerCompany: <tspan class="type">string</tspan></text>
+  <text x="420" y="410" class="field">licenseNumber: <tspan class="type">string</tspan></text>
+
+  <!-- Flight Preferences -->
+  <rect x="20" y="440" width="370" height="140" rx="5" class="enum"/>
+  <text x="30" y="460" class="subheader">Flight Preferences</text>
+  <text x="40" y="480" class="field">flightFrequency: <tspan class="type">enum</tspan></text>
+  <text x="50" y="500" class="field">• rarely</text>
+  <text x="50" y="520" class="field">• occasionally</text>
+  <text x="50" y="540" class="field">• frequently</text>
+  <text x="50" y="560" class="field">• veryFrequently</text>
+  <!-- <text x="220" y="480" class="field">brokerType: <tspan class="type">enum</tspan></text>
+  <text x="230" y="500" class="field">• medical</text>
+  <text x="230" y="520" class="field">• normal</text> -->
+
+  <!-- Arrays -->
+  <rect x="400" y="440" width="380" height="140" rx="5" class="array"/>
+  <text x="410" y="460" class="subheader">Arrays</text>
+  <text x="420" y="480" class="field">preferredAircraftTypes: <tspan class="type">array of strings</tspan></text>
+  <text x="420" y="500" class="field">specialties: <tspan class="type">array of strings</tspan></text>
+
+  <!-- Flight History -->
+  <rect x="20" y="590" width="760" height="140" rx="5" class="array"/>
+  <text x="30" y="610" class="subheader">Flight History</text>
+  <text x="40" y="630" class="field">flightHistory: <tspan class="type">array of objects</tspan></text>
+  <text x="50" y="650" class="field">• flightDate: <tspan class="type">date</tspan></text>
+  <text x="50" y="670" class="field">• origin: <tspan class="type">string</tspan></text>
+  <text x="50" y="690" class="field">• destination: <tspan class="type">string</tspan></text>
+  <text x="300" y="650" class="field">• aircraftType: <tspan class="type">string</tspan></text>
+  <text x="300" y="670" class="field">• passengerCount: <tspan class="type">int</tspan></text>
+
+  <!-- Marketing Preferences -->
+  <rect x="20" y="740" width="760" height="140" rx="5" class="object"/>
+  <text x="30" y="760" class="subheader">Marketing Preferences</text>
+  <text x="40" y="780" class="field">marketingPreferences: <tspan class="type">object</tspan></text>
+  <text x="50" y="800" class="field">• emailSubscribed: <tspan class="type">boolean</tspan></text>
+  <text x="50" y="820" class="field">• smsSubscribed: <tspan class="type">boolean</tspan></text>
+  <text x="50" y="840" class="field">• preferredContactMethod: <tspan class="type">enum (email, phone, sms)</tspan></text>
+
+</svg>

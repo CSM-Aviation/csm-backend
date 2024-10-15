@@ -103,9 +103,13 @@ exports.listS3ObjectsWithPrefix = async (prefix, maxKeys = 1000) => {
  */
 exports.generateMultipleS3Urls = async (keys, expirationInSeconds = 3600) => {
   try {
-    const urls = await Promise.all(keys.map(key =>
-      this.generateS3Url(key, expirationInSeconds)
-    ));
+    const urls = await Promise.all(keys
+      .filter(key => {
+        const parts = key.split('/');
+        return parts.length > 2 && parts[parts.length - 1] !== '';
+      })
+      .map(key => this.generateS3Url(key, expirationInSeconds))
+    );
     return urls;
   } catch (error) {
     console.error('Error generating multiple S3 URLs:', error);

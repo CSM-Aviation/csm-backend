@@ -1,0 +1,297 @@
+{
+
+  $jsonSchema: {
+
+    bsonType: 'object',
+
+    required: [
+
+      'username',
+
+      'password'
+
+    ],
+
+    properties: {
+
+      username: {
+
+        bsonType: 'string'
+
+      },
+
+      password: {
+
+        bsonType: 'string'
+
+      },
+
+      userType: {
+
+        'enum': [
+
+          'individual',
+
+          'business',
+
+          'medicalBroker',
+
+          'normalBroker'
+
+        ]
+
+      },
+
+      email: {
+
+        bsonType: 'string',
+
+        pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'
+
+      },
+
+      firstName: {
+
+        bsonType: 'string'
+
+      },
+
+      lastName: {
+
+        bsonType: 'string'
+
+      },
+
+      phoneNumber: {
+
+        bsonType: 'string'
+
+      },
+
+      address: {
+
+        bsonType: 'object',
+
+        properties: {
+
+          street: {
+
+            bsonType: 'string'
+
+          },
+
+          city: {
+
+            bsonType: 'string'
+
+          },
+
+          state: {
+
+            bsonType: 'string'
+
+          },
+
+          zipCode: {
+
+            bsonType: 'string'
+
+          },
+
+          country: {
+
+            bsonType: 'string'
+
+          }
+
+        }
+
+      },
+
+      companyName: {
+
+        bsonType: 'string'
+
+      },
+
+      companySize: {
+
+        bsonType: 'int'
+
+      },
+
+      industry: {
+
+        bsonType: 'string'
+
+      },
+
+      flightFrequency: {
+
+        'enum': [
+
+          'rarely',
+
+          'occasionally',
+
+          'frequently',
+
+          'veryFrequently'
+
+        ]
+
+      },
+
+      preferredAircraftTypes: {
+
+        bsonType: 'array',
+
+        items: {
+
+          bsonType: 'string'
+
+        }
+
+      },
+
+      brokerType: {
+
+        'enum': [
+
+          'medical',
+
+          'normal'
+
+        ]
+
+      },
+
+      brokerCompany: {
+
+        bsonType: 'string'
+
+      },
+
+      licenseNumber: {
+
+        bsonType: 'string'
+
+      },
+
+      specialties: {
+
+        bsonType: 'array',
+
+        items: {
+
+          bsonType: 'string'
+
+        }
+
+      },
+
+      flightHistory: {
+
+        bsonType: 'array',
+
+        items: {
+
+          bsonType: 'object',
+
+          properties: {
+
+            flightDate: {
+
+              bsonType: 'date'
+
+            },
+
+            origin: {
+
+              bsonType: 'string'
+
+            },
+
+            destination: {
+
+              bsonType: 'string'
+
+            },
+
+            aircraftType: {
+
+              bsonType: 'string'
+
+            },
+
+            passengerCount: {
+
+              bsonType: 'int'
+
+            }
+
+          }
+
+        }
+
+      },
+
+      marketingPreferences: {
+
+        bsonType: 'object',
+
+        properties: {
+
+          emailSubscribed: {
+
+            bsonType: 'bool'
+
+          },
+
+          smsSubscribed: {
+
+            bsonType: 'bool'
+
+          },
+
+          preferredContactMethod: {
+
+            'enum': [
+
+              'email',
+
+              'phone',
+
+              'sms'
+
+            ]
+
+          }
+
+        }
+
+      },
+
+      notes: {
+
+        bsonType: 'string'
+
+      },
+
+      createdAt: {
+
+        bsonType: 'date'
+
+      },
+
+      updatedAt: {
+
+        bsonType: 'date'
+
+      }
+
+    }
+
+  }
+
+}
