@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700">
+  <style>
+    .title { font: bold 24px sans-serif; }
+    .header { font: bold 18px sans-serif; fill: #333; }
+    .subheader { font: bold 16px sans-serif; fill: #555; }
+    .field { font: 14px sans-serif; }
+    .note { font: italic 12px sans-serif; fill: #666; }
+    .group { fill: #f0f0f0; stroke: #ccc; }
+    .category { fill: #e6f3ff; stroke: #4a86e8; }
+    .arrow { stroke: #333; stroke-width: 1.5; marker-end: url(#arrowhead); }
+    .marketing { fill: #e6ffe6; stroke: #4a8654; }
+  </style>
+  
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" />
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" class="title">CSM Aviation User Types and Marketing Potential</text>
+
+  <!-- Charter Services -->
+  <rect x="50" y="50" width="700" height="320" rx="10" class="category"/>
+  <text x="60" y="75" class="header">Charter Services (On-Demand Flights)</text>
+
+  <!-- Retail -->
+  <rect x="60" y="90" width="340" height="270" rx="10" class="group"/>
+  <text x="70" y="115" class="subheader">1. Retail (Consumer Services)</text>
+
+  <!-- Individual -->
+  <rect x="70" y="125" width="160" height="225" rx="10" class="group"/>
+  <text x="80" y="150" class="field">1.1 Individual</text>
+  <text x="90" y="170" class="field">• Single person</text>
+  <text x="90" y="190" class="field">• Less frequent flights</text>
+  <text x="90" y="210" class="field">• Personal travel</text>
+  <text x="90" y="230" class="field">• Luxury experiences</text>
+
+  <!-- Business -->
+  <rect x="240" y="125" width="150" height="225" rx="10" class="group"/>
+  <text x="250" y="150" class="field">1.2 Business</text>
+  <text x="260" y="170" class="field">• Multiple people</text>
+  <text x="260" y="190" class="field">• Frequent flights</text>
+  <text x="260" y="210" class="field">• Corporate accounts</text>
+  <text x="260" y="230" class="field">• Customized services</text>
+
+  <!-- Brokers -->
+  <rect x="410" y="90" width="330" height="270" rx="10" class="group"/>
+  <text x="420" y="115" class="subheader">2. Brokers (Intermediaries)</text>
+
+  <!-- Medical Brokers -->
+  <rect x="420" y="125" width="150" height="225" rx="10" class="group"/>
+  <text x="430" y="150" class="field">2.1 Medical Brokers</text>
+  <text x="440" y="170" class="field">• Organ transport</text>
+  <text x="440" y="190" class="field">• Emergency flights</text>
+  <text x="440" y="210" class="field">• Hospital partnerships</text>
+  <text x="440" y="230" class="field">• Specialized equipment</text>
+
+  <!-- Normal Brokers -->
+  <rect x="580" y="125" width="150" height="225" rx="10" class="group"/>
+  <text x="590" y="150" class="field">2.2 Normal Brokers</text>
+  <text x="600" y="170" class="field">• Other aviation companies</text>
+  <text x="600" y="190" class="field">• Diverse client base</text>
+  <text x="600" y="210" class="field">• Volume-based deals</text>
+  <text x="600" y="230" class="field">• Industry partnerships</text>
+
+  <!-- Internal Users -->
+  <rect x="50" y="380" width="700" height="120" rx="10" class="category"/>
+  <text x="60" y="405" class="header">Internal Users</text>
+
+  <!-- Sales -->
+  <rect x="60" y="415" width="340" height="75" rx="10" class="group"/>
+  <text x="70" y="440" class="subheader">Sales Team</text>
+  <text x="80" y="460" class="field">• Client relationship management</text>
+  <text x="80" y="480" class="field">• Quote generation and tracking</text>
+
+  <!-- Management -->
+  <rect x="410" y="415" width="330" height="75" rx="10" class="group"/>
+  <text x="420" y="440" class="subheader">Management</text>
+  <text x="430" y="460" class="field">• Performance analytics</text>
+  <text x="430" y="480" class="field">• Strategic decision making</text>
+
+  <!-- Marketing Strategies -->
+  <rect x="50" y="510" width="700" height="160" rx="10" class="marketing"/>
+  <text x="60" y="535" class="header">Targeted Marketing &amp; Service Strategies</text>
+  
+  <text x="70" y="560" class="field">• Personalized luxury packages for individual retail clients</text>
+  <text x="70" y="580" class="field">• Corporate travel solutions and volume discounts for business users</text>
+  <text x="70" y="600" class="field">• Rapid response systems and specialized equipment for medical brokers</text>
+  <text x="70" y="620" class="field">• Partnership programs and commission structures for normal brokers</text>
+  <text x="70" y="640" class="field">• Data-driven fleet management and route optimization</text>
+
+  <!-- Arrows -->
+  <line x1="400" y1="370" x2="400" y2="505" class="arrow" />
+  <line x1="400" y1="500" x2="400" y2="505" class="arrow" />
+
+  <!-- Notes -->
+  <text x="400" y="690" text-anchor="middle" class="note">Note: User categorization enables targeted services, marketing, and internal operations optimization.</text>
+</svg>
