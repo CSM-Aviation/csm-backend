@@ -4,44 +4,44 @@ const { ClientSecretCredential } = require("@azure/identity");
 const { getDb } = require('../services/dbService');
 
 // Initialize the Microsoft Graph client
-const credential = new ClientSecretCredential(
-    process.env.TENANT_ID,
-    process.env.CLIENT_ID,
-    process.env.CLIENT_SECRET
-);
+// const credential = new ClientSecretCredential(
+//     process.env.TENANT_ID,
+//     process.env.CLIENT_ID,
+//     process.env.CLIENT_SECRET
+// );
 
-const authProvider = new TokenCredentialAuthenticationProvider(credential, {
-    scopes: ['https://graph.microsoft.com/.default']
-});
+// const authProvider = new TokenCredentialAuthenticationProvider(credential, {
+//     scopes: ['https://graph.microsoft.com/.default']
+// });
 
-const client = Client.initWithMiddleware({ authProvider });
+// const client = Client.initWithMiddleware({ authProvider });
 
-// Function to send email using Microsoft Graph API
-async function sendEmail(subject, content, recipient) {
-    const message = {
-        subject: subject,
-        body: {
-            contentType: 'HTML',
-            content: content
-        },
-        toRecipients: [
-            {
-                emailAddress: {
-                    address: recipient
-                }
-            }
-        ]
-    };
+// // Function to send email using Microsoft Graph API
+// async function sendEmail(subject, content, recipient) {
+//     const message = {
+//         subject: subject,
+//         body: {
+//             contentType: 'HTML',
+//             content: content
+//         },
+//         toRecipients: [
+//             {
+//                 emailAddress: {
+//                     address: recipient
+//                 }
+//             }
+//         ]
+//     };
 
-    try {
-        await client.api('/users/gkallem@csmaviation.com/sendMail')
-            .post({ message });
-        console.log('Email sent successfully');
-    } catch (error) {
-        console.error('Error sending email:', error);
-        throw error;
-    }
-}
+//     try {
+//         await client.api('/users/gkallem@csmaviation.com/sendMail')
+//             .post({ message });
+//         console.log('Email sent successfully');
+//     } catch (error) {
+//         console.error('Error sending email:', error);
+//         throw error;
+//     }
+// }
 
 // Updated trip request submission function
 exports.submitTripRequest = async (req, res) => {
