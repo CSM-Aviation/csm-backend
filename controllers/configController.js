@@ -13,7 +13,11 @@ exports.getConfig = async (req, res) => {
     if (config.home_video) {
       try {
         const videoUrl = await generateS3Url(`${config.home_video}`);
+        const f1VideoUrl1 = await generateS3Url(`${config.f1_video1}`);
+        const f1VideoUrl2 = await generateS3Url(`${config.f1_video2}`);
         config.home_video = videoUrl;
+        config.f1VideoUrl1 = f1VideoUrl1;
+        config.f1VideoUrl2 = f1VideoUrl2;
       } catch (error) {
         console.error('Error generating video URL:', error);
       }
