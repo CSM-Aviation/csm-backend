@@ -71,20 +71,33 @@ exports.getDashboardData = async (req, res) => {
 
         // Geographical Data
         const userLocations = await pageviews.aggregate([
-            { $match: matchStage },
-            {
-                $group: {
-                    _id: {
-                        city: "$city",
-                        region: "$region",
-                        country: "$country"
+            { $match: matchStage }, // Add time range filter
+            { 
+                $group: { 
+                    _id: { 
+                        city: "$city", 
+                        region: "$region", 
+                        country: "$country" 
                     },
-                    count: { $sum: 1 }
+                    count: { $sum: 1 } 
+                } 
+            },
+            { 
+                $project: {
+                    _id: 0,
+                    location: {
+                        $concat: [
+                            { $ifNull: ["$_id.city", "Unknown"] }, ", ",
+                            { $ifNull: ["$_id.region", "Unknown"] }, ", ",
+                            { $ifNull: ["$_id.country", "Unknown"] }
+                        ]
+                    },
+                    count: 1
                 }
             },
-            { $sort: { count: -1 } },
-            { $limit: 10 }
+            { $sort: { count: -1 } } // Sort by count in descending order
         ]).toArray();
+
 
         // Page Analytics
         const pagesVisited = await pageviews.aggregate([
@@ -157,10 +170,11 @@ exports.getDashboardData = async (req, res) => {
                 trafficSources: Object.fromEntries(trafficSources.map(item => [item._id || 'Direct', item.count]))
             },
             geography: {
-                userLocations: userLocations.map(item => ({
-                    location: `${item._id.city}, ${item._id.region}, ${item._id.country}`,
-                    count: item.count
-                }))
+                userLocations: Object.fromEntries(
+                    userLocations
+                        .filter(item => item.location.includes(',')) // Filter out malformed locations
+                        .map(item => [item.location, item.count])
+                )
             },
             content: {
                 pagesVisited
