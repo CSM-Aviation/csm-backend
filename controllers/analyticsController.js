@@ -20,53 +20,195 @@ exports.getDashboardData = async (req, res) => {
     try {
         const db = getDb();
         const pageviews = db.collection('pageviews');
+        const { timeframe = '7d' } = req.query;
 
-        const distinctVisitors = await pageviews.distinct('sessionId');
+        // Calculate date range based on timeframe
+        const dateRange = getDateRange(timeframe);
+        const matchStage = {
+            timestamp: {
+                $gte: dateRange.startDate,
+                $lte: dateRange.endDate
+            }
+        };
+
+        // Basic metrics
+        const distinctVisitors = await pageviews.distinct('sessionId', matchStage);
         const totalVisitors = distinctVisitors.length;
-        const totalPageViews = await pageviews.countDocuments();
+        const totalPageViews = await pageviews.countDocuments(matchStage);
 
-        const newUsersQuery = { pageViews: 1 };
+        // New vs Returning Users
+        const newUsersQuery = { ...matchStage, pageViews: 1 };
         const distinctNewUsers = await pageviews.distinct('sessionId', newUsersQuery);
         const newUsers = distinctNewUsers.length;
+        const returningUsers = totalVisitors - newUsers;
 
-        const last7Days = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-        const pageViewsLast7Days = await pageviews.aggregate([
-            { $match: { timestamp: { $gte: last7Days } } },
-            { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$timestamp" } }, count: { $sum: 1 } } },
-            { $sort: { _id: 1 } }
+        // Engagement Metrics
+        const hourlyActivity = await pageviews.aggregate([
+            { $match: matchStage },
+            {
+                $group: {
+                    _id: {
+                        $hour: "$timestamp"
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { "_id": 1 } }
         ]).toArray();
 
-        const userLocations = await pageviews.aggregate([
-            { $group: { _id: { city: "$city", region: "$region", country: "$country" }, count: { $sum: 1 } } },
-            { $sort: { count: -1 } },
-            { $limit: 5 }
-        ]).toArray();
-
-        const pagesVisited = await pageviews.aggregate([
-            { $group: { _id: "$path", count: { $sum: 1 } } },
+        // Traffic Source Analysis
+        const trafficSources = await pageviews.aggregate([
+            { $match: matchStage },
+            {
+                $group: {
+                    _id: "$referrer",
+                    count: { $sum: 1 }
+                }
+            },
             { $sort: { count: -1 } },
             { $limit: 10 }
         ]).toArray();
 
+        // Geographical Data
+        const userLocations = await pageviews.aggregate([
+            { $match: matchStage }, // Add time range filter
+            { 
+                $group: { 
+                    _id: { 
+                        city: "$city", 
+                        region: "$region", 
+                        country: "$country" 
+                    },
+                    count: { $sum: 1 } 
+                } 
+            },
+            { 
+                $project: {
+                    _id: 0,
+                    location: {
+                        $concat: [
+                            { $ifNull: ["$_id.city", "Unknown"] }, ", ",
+                            { $ifNull: ["$_id.region", "Unknown"] }, ", ",
+                            { $ifNull: ["$_id.country", "Unknown"] }
+                        ]
+                    },
+                    count: 1
+                }
+            },
+            { $sort: { count: -1 } } // Sort by count in descending order
+        ]).toArray();
+
+
+        // Page Analytics
+        const pagesVisited = await pageviews.aggregate([
+            { $match: matchStage },
+            {
+                $group: {
+                    _id: "$path",
+                    views: { $sum: 1 },
+                    uniqueVisitors: { $addToSet: "$sessionId" }
+                }
+            },
+            {
+                $project: {
+                    path: "$_id",
+                    views: 1,
+                    uniqueVisitors: { $size: "$uniqueVisitors" },
+                    bounceRate: {
+                        $multiply: [
+                            {
+                                $divide: [
+                                    { $subtract: ["$views", { $size: "$uniqueVisitors" }] },
+                                    "$views"
+                                ]
+                            },
+                            100
+                        ]
+                    }
+                }
+            },
+            { $sort: { views: -1 } },
+            { $limit: 10 }
+        ]).toArray();
+
+        // Visitor Trend
         const visitorTrend = await pageviews.aggregate([
-            { $match: { timestamp: { $gte: last7Days } } },
-            { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$timestamp" } }, visitors: { $addToSet: "$sessionId" } } },
-            { $project: { date: "$_id", visitors: { $size: "$visitors" }, _id: 0 } },
+            { $match: matchStage },
+            {
+                $group: {
+                    _id: {
+                        $dateToString: {
+                            format: "%Y-%m-%d",
+                            date: "$timestamp"
+                        }
+                    },
+                    visitors: { $addToSet: "$sessionId" },
+                    pageviews: { $sum: 1 }
+                }
+            },
+            {
+                $project: {
+                    date: "$_id",
+                    visitors: { $size: "$visitors" },
+                    pageviews: 1,
+                    _id: 0
+                }
+            },
             { $sort: { date: 1 } }
         ]).toArray();
 
         res.json({
-            totalVisitors,
-            totalPageViews,
-            newUsers,
-            dates: pageViewsLast7Days.map(item => item._id),
-            pageViews: pageViewsLast7Days.map(item => item.count),
-            userLocations: Object.fromEntries(userLocations.map(item => [`${item._id.city}, ${item._id.region}, ${item._id.country}`, item.count])),
-            pagesVisited: Object.fromEntries(pagesVisited.map(item => [item._id, item.count])),
-            visitorTrend
+            timeframe,
+            overview: {
+                totalVisitors,
+                totalPageViews,
+                newUsers,
+                returningUsers
+            },
+            engagement: {
+                hourlyActivity,
+                trafficSources: Object.fromEntries(trafficSources.map(item => [item._id || 'Direct', item.count]))
+            },
+            geography: {
+                userLocations: Object.fromEntries(
+                    userLocations
+                        .filter(item => item.location.includes(',')) // Filter out malformed locations
+                        .map(item => [item.location, item.count])
+                )
+            },
+            content: {
+                pagesVisited
+            },
+            trends: {
+                visitorTrend
+            }
         });
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
         res.status(500).json({ error: 'Server error' });
     }
 };
+
+function getDateRange(timeframe) {
+    const endDate = new Date();
+    let startDate = new Date();
+
+    switch (timeframe) {
+        case '24h':
+            startDate.setHours(startDate.getHours() - 24);
+            break;
+        case '7d':
+            startDate.setDate(startDate.getDate() - 7);
+            break;
+        case '30d':
+            startDate.setDate(startDate.getDate() - 30);
+            break;
+        case '90d':
+            startDate.setDate(startDate.getDate() - 90);
+            break;
+        default:
+            startDate.setDate(startDate.getDate() - 7);
+    }
+
+    return { startDate, endDate };
+}
