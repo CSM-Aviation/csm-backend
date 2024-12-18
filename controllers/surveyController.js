@@ -247,7 +247,7 @@ exports.updateApprovalStatus = async (req, res) => {
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                         <h1 style="color: #004080;">Thank You for Your Testimonial</h1>
                         <p>Dear ${survey.fullName},</p>
-                        <p>We're pleased to inform you that your testimonial has been approved and will be featured on our website.</p>
+                        <p>We're pleased to inform you that your testimonial has been approved and will be featured on our <a href="https://www.csmaviation.com/">website</a> in the Testimonials section..</p>
                         <p>Thank you for sharing your experience with us!</p>
                         <br>
                         <p>Best regards,</p>
