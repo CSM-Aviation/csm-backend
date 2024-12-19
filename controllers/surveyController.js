@@ -55,67 +55,71 @@ exports.submitSurvey = async (req, res) => {
 
         const result = await db.collection('customer_surveys').insertOne(survey);
 
-        // Generate signed URLs for approval/rejection
-        const baseUrl = process.env.API_BASE_URL || 'http://localhost:5000';
-        const approveToken = generateSignedUrl(result.insertedId.toString(), 'approve');
-        const rejectToken = generateSignedUrl(result.insertedId.toString(), 'reject');
-        
-        const approveUrl = `${baseUrl}/api/surveys/approve/${approveToken}`;
-        const rejectUrl = `${baseUrl}/api/surveys/reject/${rejectToken}`;
+        // Only send admin email if willRecommend is true
+        if (willRecommend === 'Yes') {
+            // Generate signed URLs for approval/rejection
+            const baseUrl = process.env.API_BASE_URL || 'http://localhost:5000';
+            const approveToken = generateSignedUrl(result.insertedId.toString(), 'approve');
+            const rejectToken = generateSignedUrl(result.insertedId.toString(), 'reject');
+            
+            const approveUrl = `${baseUrl}/api/surveys/approve/${approveToken}`;
+            const rejectUrl = `${baseUrl}/api/surveys/reject/${rejectToken}`;
 
-        // Email template
-        const mailOptions = {
-            from: process.env.GMAIL_USER,
-            to: process.env.ADMIN_EMAIL,
-            subject: 'New Testimonial Pending Approval',
-            html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h1 style="color: #004080;">New Testimonial Submission</h1>
-                    
-                    <div style="margin: 20px 0; padding: 20px; background-color: #f5f5f5; border-radius: 5px;">
-                        <h2 style="color: #333;">Customer Details:</h2>
-                        <p><strong>Name:</strong> ${fullName}</p>
-                        <p><strong>Email:</strong> ${email || 'Not provided'}</p>
+            // Email template
+            const mailOptions = {
+                from: process.env.GMAIL_USER,
+                to: process.env.ADMIN_EMAIL,
+                subject: 'New Testimonial Pending Approval',
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                        <h1 style="color: #004080;">New Testimonial Submission</h1>
                         
-                        <h2 style="color: #333; margin-top: 20px;">Ratings:</h2>
-                        <ul style="list-style: none; padding: 0;">
-                            <li>Booking Efficiency: ${bookingEfficiency}/5</li>
-                            <li>Aircraft Cleanliness: ${aircraftCleanliness}/5</li>
-                            <li>Cabin Comfort: ${cabinComfort}/5</li>
-                            <li>Crew Professionalism: ${crewProfessionalism}/5</li>
-                            <li>Overall Satisfaction: ${overallSatisfaction}/5</li>
-                        </ul>
-                        
-                        <h2 style="color: #333; margin-top: 20px;">Testimonial:</h2>
-                        <p style="background: white; padding: 15px; border-radius: 5px;">${comments}</p>
-                        
-                        <p><strong>Willing to Recommend:</strong> ${willRecommend}</p>
-                        <p><strong>Submitted At:</strong> ${survey.submittedAt.toLocaleString()}</p>
-                    </div>
-                    
-                    <div style="text-align: center; margin-top: 30px;">
-                        <div style="margin-bottom: 20px;">
-                            <a href="${approveUrl}" 
-                               style="background-color: #28a745; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; margin-right: 10px; display: inline-block;">
-                                PUBLISH TESTIMONIAL
-                            </a>
+                        <div style="margin: 20px 0; padding: 20px; background-color: #f5f5f5; border-radius: 5px;">
+                            <h2 style="color: #333;">Customer Details:</h2>
+                            <p><strong>Name:</strong> ${fullName}</p>
+                            <p><strong>Email:</strong> ${email || 'Not provided'}</p>
+                            
+                            <h2 style="color: #333; margin-top: 20px;">Ratings:</h2>
+                            <ul style="list-style: none; padding: 0;">
+                                <li>Booking Efficiency: ${bookingEfficiency}/5</li>
+                                <li>Aircraft Cleanliness: ${aircraftCleanliness}/5</li>
+                                <li>Cabin Comfort: ${cabinComfort}/5</li>
+                                <li>Crew Professionalism: ${crewProfessionalism}/5</li>
+                                <li>Overall Satisfaction: ${overallSatisfaction}/5</li>
+                            </ul>
+                            
+                            <h2 style="color: #333; margin-top: 20px;">Testimonial:</h2>
+                            <p style="background: white; padding: 15px; border-radius: 5px;">${comments}</p>
+                            
+                            <p><strong>Willing to Recommend:</strong> ${willRecommend}</p>
+                            <p><strong>Submitted At:</strong> ${survey.submittedAt.toLocaleString()}</p>
                         </div>
-                        <div>
-                            <a href="${rejectUrl}" 
-                               style="background-color: #dc3545; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; display: inline-block;">
-                                DON'T PUBLISH TESTIMONIAL
-                            </a>
+                        
+                        <div style="text-align: center; margin-top: 30px;">
+                            <div style="margin-bottom: 20px;">
+                                <a href="${approveUrl}" 
+                                style="background-color: #28a745; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; margin-right: 10px; display: inline-block;">
+                                    PUBLISH TESTIMONIAL
+                                </a>
+                            </div>
+                            <div>
+                                <a href="${rejectUrl}" 
+                                style="background-color: #dc3545; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                                    DON'T PUBLISH TESTIMONIAL
+                                </a>
+                            </div>
                         </div>
+                        
+                        <p style="margin-top: 30px; font-size: 12px; color: #666; text-align: center;">
+                            These links will expire in 7 days for security purposes.
+                        </p>
                     </div>
-                    
-                    <p style="margin-top: 30px; font-size: 12px; color: #666; text-align: center;">
-                        These links will expire in 7 days for security purposes.
-                    </p>
-                </div>
-            `
-        };
+                `
+            };
 
-        await transporter.sendMail(mailOptions);
+            await transporter.sendMail(mailOptions);
+
+        }
 
         res.status(201).json({ 
             message: 'Survey submitted successfully', 
