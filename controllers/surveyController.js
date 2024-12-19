@@ -97,13 +97,13 @@ exports.submitSurvey = async (req, res) => {
                         <div style="margin-bottom: 20px;">
                             <a href="${approveUrl}" 
                                style="background-color: #28a745; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; margin-right: 10px; display: inline-block;">
-                                APPROVE TESTIMONIAL
+                                PUBLISH TESTIMONIAL
                             </a>
                         </div>
                         <div>
                             <a href="${rejectUrl}" 
                                style="background-color: #dc3545; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; display: inline-block;">
-                                REJECT TESTIMONIAL
+                                DON'T PUBLISH TESTIMONIAL
                             </a>
                         </div>
                     </div>
