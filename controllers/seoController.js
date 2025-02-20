@@ -9,6 +9,7 @@ exports.getSeoData = async (req, res) => {
 
         if (seoData) {
             res.json({
+                _id: seoData._id,
                 title: seoData.title,
                 description: seoData.description,
                 keywords: seoData.keywords,
