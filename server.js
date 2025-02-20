@@ -17,6 +17,7 @@ const analyticsRoutes = require('./routes/analyticsRoutes');
 const seoRoutes = require('./routes/seoRoutes');
 const subscribeRoutes = require('./routes/subscribeRoutes');
 const surveyRoutes = require('./routes/surveyRoutes');
+const vendorRoute = require('./routes/vendorRoutes');
 
 dotenv.config();
 
@@ -59,6 +60,8 @@ connectToDatabase().then(() => {
   app.use('/api/seo', seoRoutes);
   app.use('/api/subscribe', subscribeRoutes);
   app.use('/api/surveys', surveyRoutes);
+  app.use('/api/vendor-form', vendorRoute);
+  
 
   app.get('/', (req, res) => {
     res.json('Hello from the CSM Aviation backend!');
