@@ -196,7 +196,7 @@ class MicrosoftService {
 
             // Use the folder ID for uploading
             const uploadResponse = await client
-                .api(`/me/drive/items/${folderInfo.folderId}/children/${fileData.name}/content`)
+                .api(`/me/drive/items/${folderInfo.id}/children/${fileData.name}/content`)
                 .put(fileData.content);
 
             return uploadResponse;
@@ -235,7 +235,6 @@ class MicrosoftService {
      * @param {string} folderName Name of the folder to create
      * @returns {Promise<Object>} Created folder information
      */
-    // In microsoftService.js, modify the createFolder function
     async createFolder(parentFolderId, folderName) {
         try {
             const client = await this.initialize();
@@ -299,64 +298,103 @@ class MicrosoftService {
     async ensureFolderPath(folderPath) {
         if (!folderPath) {
             // Return the root folder
-            const rootFolder = await client.api('/me/drive/root').get();
-            return {
-                folderId: rootFolder.id,
-                folderPath: '/',
-                webUrl: rootFolder.webUrl
-            };
+            const rootFolder = await this.client.api('/me/drive/root').get();
+            return rootFolder;
         }
 
         try {
             const client = await this.initialize();
 
-            // Clean up the path and split it
-            const segments = folderPath.split('/').filter(segment => segment.trim() !== '');
-            console.log(`Creating folder path with segments:`, segments);
-
-            // Always start from the root folder for consistency
-            let currentFolder = await client.api('/me/drive/root').get();
-
-            // Process each folder segment
-            for (const segment of segments) {
-                try {
-                    // Get all children of the current folder
-                    const childrenResponse = await client.api(`/me/drive/items/${currentFolder.id}/children`).get();
-                    const children = childrenResponse.value;
-
-                    // Look for an existing folder with the same name
-                    const existingFolder = children.find(item =>
-                        item.name === segment && item.folder);
-
-                    if (existingFolder) {
-                        // Use the existing folder
-                        currentFolder = existingFolder;
-                        console.log(`Found existing folder: ${segment} (${currentFolder.id})`);
-                    } else {
-                        // Create the folder
-                        const folderDefinition = {
-                            name: segment,
-                            folder: {},
-                            '@microsoft.graph.conflictBehavior': 'rename'
-                        };
-
-                        currentFolder = await client
-                            .api(`/me/drive/items/${currentFolder.id}/children`)
-                            .post(folderDefinition);
-
-                        console.log(`Created folder: ${segment} (${currentFolder.id})`);
-                    }
-                } catch (error) {
-                    console.error(`Error processing folder segment "${segment}":`, error);
-                    throw error;
+            // First try to get the folder directly by path
+            try {
+                const formattedPath = folderPath.replace(/^\/+|\/+$/g, '');
+                const existingFolder = await client.api(`/me/drive/root:/${formattedPath}`).get();
+                console.log(`Found existing folder path: ${folderPath}`);
+                return existingFolder;
+            } catch (pathError) {
+                if (pathError.statusCode !== 404) {
+                    throw pathError;
                 }
-            }
+                
+                // Folder not found by path, try to find the first segment
+                const segments = folderPath.split('/').filter(segment => segment.trim() !== '');
+                const firstSegment = segments[0];
+                console.log(`Looking for first segment: ${firstSegment}`);
+                
+                // Get all items at root to find the folder
+                const rootItems = await client.api('/me/drive/root/children').get();
+                console.log('Root items:', rootItems.value.map(item => item.name));
 
-            return {
-                folderId: currentFolder.id,
-                folderPath: folderPath,
-                webUrl: currentFolder.webUrl
-            };
+                // Try to find either exact match or a similar folder (e.g., OPERATORS for Charter_OPERATORS)
+                const targetFolder = rootItems.value.find(item => 
+                    (item.folder && (
+                        item.name === firstSegment || 
+                        (firstSegment === 'Charter_OPERATORS' && item.name === 'OPERATORS') ||
+                        (firstSegment === 'OPERATORS' && item.name === 'Charter_OPERATORS')
+                    ))
+                );
+                
+                if (!targetFolder) {
+                    throw new Error(`Cannot find folder matching: ${firstSegment}`);
+                }
+                
+                // We found the target folder, now create remaining segments if needed
+                let currentFolder = targetFolder;
+                
+                // Process remaining folder segments
+                for (let i = 1; i < segments.length; i++) {
+                    const segment = segments[i];
+                    try {
+                        // Get all children of the current folder
+                        const childrenResponse = await client.api(`/me/drive/items/${currentFolder.id}/children`).get();
+                        const children = childrenResponse.value;
+
+                        // Look for an existing folder with the same name
+                        const existingFolder = children.find(item =>
+                            item.name === segment && item.folder);
+
+                        if (existingFolder) {
+                            // Use the existing folder
+                            currentFolder = existingFolder;
+                            console.log(`Found existing folder: ${segment} (${currentFolder.id})`);
+                        } else {
+                            // Create the folder
+                            const folderDefinition = {
+                                name: segment,
+                                folder: {},
+                                '@microsoft.graph.conflictBehavior': 'fail'
+                            };
+
+                            try {
+                                currentFolder = await client
+                                    .api(`/me/drive/items/${currentFolder.id}/children`)
+                                    .post(folderDefinition);
+                                console.log(`Created folder: ${segment} (${currentFolder.id})`);
+                            } catch (createError) {
+                                if (createError.statusCode === 409) {
+                                    // Folder was created concurrently, fetch it
+                                    const childrenRetry = await client.api(`/me/drive/items/${currentFolder.id}/children`).get();
+                                    const existingRetry = childrenRetry.value.find(item =>
+                                        item.name === segment && item.folder);
+                                    if (existingRetry) {
+                                        currentFolder = existingRetry;
+                                        console.log(`Using concurrently created folder: ${segment} (${currentFolder.id})`);
+                                    } else {
+                                        throw createError;
+                                    }
+                                } else {
+                                    throw createError;
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        console.error(`Error processing folder segment "${segment}":`, error);
+                        throw error;
+                    }
+                }
+
+                return currentFolder;
+            }
         } catch (error) {
             console.error('Error ensuring folder path:', error);
             throw error;
