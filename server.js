@@ -18,6 +18,7 @@ const seoRoutes = require('./routes/seoRoutes');
 const subscribeRoutes = require('./routes/subscribeRoutes');
 const surveyRoutes = require('./routes/surveyRoutes');
 const vendorRoute = require('./routes/vendorRoutes');
+const microsoftAuthRoutes = require('./routes/microsoftAuthRoutes');
 
 dotenv.config();
 
@@ -27,18 +28,22 @@ const port = process.env.PORT || 5000;
 const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
 app.use(cors({
   origin: function (origin, callback) {
-    // allow requests with no origin 
-    // (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      var msg = 'The CORS policy for this site does not ' +
-        'allow access from the specified Origin.';
-      return callback(new Error(msg), false);
+    // Always allow requests from the same origin (like form submissions)
+    if (!origin || origin === 'null') {
+      console.log("Request with no origin allowed");
+      return callback(null, true);
     }
-    return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      // console.log("Origin allowed:", origin);
+      return callback(null, true);
+    }
+
+    console.log("Origin rejected:", origin);
+    return callback(new Error('CORS policy restriction'), false);
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'Origin', 'Accept'],
   credentials: true,
 }));
 app.use(apiKeyMiddleware);
@@ -61,7 +66,8 @@ connectToDatabase().then(() => {
   app.use('/api/subscribe', subscribeRoutes);
   app.use('/api/surveys', surveyRoutes);
   app.use('/api/vendor-form', vendorRoute);
-  
+  app.use('/api', microsoftAuthRoutes);
+
 
   app.get('/', (req, res) => {
     res.json('Hello from the CSM Aviation backend!');

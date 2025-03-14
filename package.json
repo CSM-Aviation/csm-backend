@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@azure/identity": "^4.4.1",
+    "@azure/msal-node": "^3.3.0",
     "@microsoft/microsoft-graph-client": "^3.0.7",
     "aws-sdk": "^2.1691.0",
     "aws-sdk-js-codemod": "^2.3.2",

@@ -1,5 +1,5 @@
 const apiKeyMiddleware = (req, res, next) => {
-    if (req.path.startsWith('/api/surveys/approve/') || req.path.startsWith('/api/surveys/reject/')) {
+    if (req.path.startsWith('/api/surveys/approve/') || req.path.startsWith('/api/surveys/reject/') || req.path.startsWith('/api/vendor-form/approve/') || req.path.startsWith('/api/vendor-form/reject/') || req.path.startsWith('/api/vendor-form/reject-form/') || req.path.startsWith('/api/auth/microsoft/callback')) {
         return next();
     }
     const apiKey = req.get('X-API-Key');
