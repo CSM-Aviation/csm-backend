@@ -31,7 +31,7 @@ async function getSiteInfo() {
 
   // List drives for the first site (you can change the index as needed)
   if (sites.value.length > 0) {
-    const siteId = process.env.MICROSOFT_SITE_ID;
+    const siteId = process.env.MICROSOFT_MARKETING_SITE_ID;
     console.log(`\n=== DRIVES for site: ${siteId} ===`);
     const drives = await client.api(`/sites/${siteId}/drives`).get();
     drives.value.forEach(drive => {

@@ -189,6 +189,61 @@ exports.getDashboardData = async (req, res) => {
     }
 };
 
+exports.getMonthlyKPIData = async (month, year) => {
+    try {
+        const db = getDb();
+        const pageviews = db.collection('pageviews');
+
+        // Calculate start and end date for the specified month
+        const startDate = new Date(year, month - 1, 1);
+        const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+        const matchStage = {
+            timestamp: {
+                $gte: startDate,
+                $lte: endDate
+            }
+        };
+
+        // Get Total Sessions (distinct sessionIds)
+        const distinctSessions = await pageviews.distinct('sessionId', matchStage);
+        const totalSessions = distinctSessions.length;
+
+        // Get New vs Returning Visitors
+        const newUsersQuery = { ...matchStage, pageViews: 1 };
+        const distinctNewUsers = await pageviews.distinct('sessionId', newUsersQuery);
+        const newUsers = distinctNewUsers.length;
+        const returningUsers = totalSessions - newUsers;
+
+        // Get Source Breakdown
+        const sourceBreakdown = await pageviews.aggregate([
+            { $match: matchStage },
+            {
+                $group: {
+                    _id: "$referrer",
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { count: -1 } }
+        ]).toArray();
+
+        return {
+            totalSessions,
+            visitorBreakdown: {
+                newVisitors: newUsers,
+                returningVisitors: returningUsers
+            },
+            sourceBreakdown: sourceBreakdown.map(source => ({
+                source: source._id || 'Direct',
+                visits: source.count
+            }))
+        };
+    } catch (error) {
+        console.error('Error getting monthly KPI data:', error);
+        throw error;
+    }
+};
+
 function getDateRange(timeframe) {
     const endDate = new Date();
     let startDate = new Date();

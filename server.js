@@ -20,6 +20,7 @@ const surveyRoutes = require('./routes/surveyRoutes');
 const vendorRoute = require('./routes/vendorRoutes');
 const microsoftAuthRoutes = require('./routes/microsoftAuthRoutes');
 
+require('./jobs/website_kip_update_to_sharepoint_scheduler');
 dotenv.config();
 
 const app = express();

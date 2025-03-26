@@ -18,8 +18,8 @@ async function testUploadToOperators() {
       'TENANT_ID', 
       'CLIENT_ID', 
       'CLIENT_SECRET',
-      'MICROSOFT_SITE_ID',
-      'MICROSOFT_DRIVE_ID'
+      'MICROSOFT_CHARTER_SITE_ID',
+      'MICROSOFT_CHARTER_DRIVE_ID'
     ];
     
     const missingVars = requiredVars.filter(varName => !process.env[varName]);
@@ -53,8 +53,8 @@ async function testUploadToOperators() {
 
     // Step 3: Get drive information
     console.log('\nStep 3: Getting drive information...');
-    const siteId = process.env.MICROSOFT_SITE_ID;
-    const driveId = process.env.MICROSOFT_DRIVE_ID;
+    const siteId = process.env.MICROSOFT_CHARTER_SITE_ID;
+    const driveId = process.env.MICROSOFT_CHARTER_DRIVE_ID;
     
     const drive = await client.api(`/sites/${siteId}/drives/${driveId}`).get();
     console.log(`Drive: ${drive.name}`);
