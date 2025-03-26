@@ -86,7 +86,7 @@ class KPIUpdateService {
 
             // Get current month's data
             const currentDate = new Date();
-            const currentMonth = currentDate.getMonth();
+            const currentMonth = currentDate.getMonth() + 1;
             const currentYear = currentDate.getFullYear();
 
             // Get analytics data
