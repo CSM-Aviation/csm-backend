@@ -61,7 +61,15 @@ exports.getDashboardData = async (req, res) => {
             { $match: matchStage },
             {
                 $group: {
-                    _id: "$referrer",
+                    _id: {
+                        referrer: "$referrer",
+                        sessionId: "$sessionId"
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: "$_id.referrer",
                     count: { $sum: 1 }
                 }
             },
@@ -220,7 +228,15 @@ exports.getMonthlyKPIData = async (month, year) => {
             { $match: matchStage },
             {
                 $group: {
-                    _id: "$referrer",
+                    _id: {
+                        referrer: "$referrer",
+                        sessionId: "$sessionId"
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: "$_id.referrer",
                     count: { $sum: 1 }
                 }
             },

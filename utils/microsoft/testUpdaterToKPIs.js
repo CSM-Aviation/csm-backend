@@ -110,7 +110,7 @@ async function testUpdaterToKPIs() {
     console.log('\nStep 6: Looking for KPI\'s folder...');
     
     const kpisFolder = rootItems.value.find(item => 
-      item.folder && (item.name === "KPI's" || item.name.toLowerCase() === "kpis_test"));
+      item.folder && (item.name === "KPI's" || item.name.toLowerCase() === "kpis"));
     
     // Initialize kpisFolderItems outside the if block
     let kpisFolderItems = { value: [] };
@@ -151,7 +151,7 @@ async function testUpdaterToKPIs() {
     // Look for the specific Excel file in the KPI's folder
     if (kpisFolder && kpisFolderItems.value && kpisFolderItems.value.length > 0) {
       excelFile = kpisFolderItems.value.find(item => 
-        item.file && item.name === 'CSM_website_KPIs_test.xlsx');
+        item.file && item.name === 'CSM_website_KPIs.xlsx');
       
       if (excelFile) {
         console.log(`Found target Excel file in KPI's folder: ${excelFile.name}`);
