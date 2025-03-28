@@ -53,10 +53,10 @@ class KPIUpdateService {
             .get();
 
         const kpisFolder = driveItems.value.find(item => 
-            item.name === 'KPIs_test' && item.folder);
+            item.name.toLowerCase() === 'kpis' && item.folder);
 
         if (!kpisFolder) {
-            throw new Error('KPIs_test folder not found');
+            throw new Error('KPIs folder not found');
         }
 
         // Find the Excel file in the KPIs folder
@@ -65,7 +65,7 @@ class KPIUpdateService {
             .get();
 
         const excelFile = kpisFolderItems.value.find(item => 
-            item.name === 'CSM_website_KPIs_test.xlsx');
+            item.name.toLowerCase() === 'CSM_website_KPIs.xlsx'.toLowerCase());
 
         if (!excelFile) {
             throw new Error('KPI Excel file not found');
@@ -118,18 +118,30 @@ class KPIUpdateService {
             sourceBreakdown: `${column}4`
         };
 
+        // Get worksheets in the workbook
+        const worksheets = await this.client
+            .api(`/sites/${this.siteId}/drives/${this.driveId}/items/${fileId}/workbook/worksheets`)
+            .get();
+
+        if (!worksheets.value || worksheets.value.length === 0) {
+            throw new Error('No worksheets found in the workbook');
+        }
+
+        // Use the first worksheet
+        const worksheet = worksheets.value[0];
+
         // Update Total Sessions
         await this.client
-            .api(`/sites/${this.siteId}/drives/${this.driveId}/items/${fileId}/workbook/worksheets/Sheet1/range(address='${ranges.totalSessions}')`)
+            .api(`/sites/${this.siteId}/drives/${this.driveId}/items/${fileId}/workbook/worksheets('${worksheet.name}')/range(address='${ranges.totalSessions}')`)
             .patch({
                 values: [[data.totalSessions]]
             });
 
         // Update New vs Returning Visitors
         await this.client
-            .api(`/sites/${this.siteId}/drives/${this.driveId}/items/${fileId}/workbook/worksheets/Sheet1/range(address='${ranges.newVisitors}')`)
+            .api(`/sites/${this.siteId}/drives/${this.driveId}/items/${fileId}/workbook/worksheets('${worksheet.name}')/range(address='${ranges.newVisitors}')`)
             .patch({
-                values: [[data.visitorBreakdown.newVisitors]]
+                values: [[`${data.visitorBreakdown.newVisitors} vs ${data.visitorBreakdown.returningVisitors}`]]
             });
 
         // Update Source Breakdown
@@ -138,7 +150,7 @@ class KPIUpdateService {
             .join('\n');
         
         await this.client
-            .api(`/sites/${this.siteId}/drives/${this.driveId}/items/${fileId}/workbook/worksheets/Sheet1/range(address='${ranges.sourceBreakdown}')`)
+            .api(`/sites/${this.siteId}/drives/${this.driveId}/items/${fileId}/workbook/worksheets('${worksheet.name}')/range(address='${ranges.sourceBreakdown}')`)
             .patch({
                 values: [[sourceBreakdownText]]
             });
