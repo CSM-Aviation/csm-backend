@@ -25,7 +25,7 @@ exports.submitContact = async (req, res) => {
     // Prepare email content
     const mailOptions = {
       from: process.env.GMAIL_USER,
-      to: process.env.ADMIN_EMAIL,
+      to: process.env.CHARTER_EMAIL,
       subject: 'New Contact Form Submission',
       html: `
           <h1>New Contact Form Submission</h1>
